@@ -12327,3 +12327,49 @@ builtins/printf.def
 	  discussed in thread starting with
 	  https://lists.gnu.org/archive/html/bug-bash/2025-02/msg00151.html
 
+				   12/5
+				   ----
+lib/sh/uconvert.c
+	- uconvert: allow locale's decimal point character to serve as radix
+	  character when parsing fixed-point number into seconds and
+	  microseconds
+
+				   12/8
+				   ----
+input.c
+	- b_fill_buffer: handle unlikely case of file descriptor being made
+	  non-blocking by retrying read on EAGAIN/EWOULDBLOCK
+	  Report and patch from Keno Fischer <keno@juliahub.com>
+
+				   12/10
+				   -----
+builtins/shopt.def
+	- get_shopt_options: don't allocate memory for each member of the
+	  option name array, since programmable completion doesn't free the
+	  list members
+	  From https://savannah.gnu.org/patch/?10551
+
+				   12/12
+				   -----
+subst.c
+	- expand_string_for_patsub42: new function, uses code from bash-4.2 to
+	  expand the pattern replacement string if patsub_replacement is not
+	  set; calls expand_string_for_patsub with the same value for QUOTING
+	  to quote patsub_replacement strings appropriately if it is set.
+	  This means that double-quoting the pattern substitution has the
+	  effect of quoting any `&' in the replacement string, which is iffy
+	  but closer to what bash-4.2 did
+	- parameter_brace_patsub: call expand_string_for_patsub42 if the
+	  shell compatibility level is <= 42
+	- quote_string_for_repl: if the shell compatibility level is <= 42
+	  and the replacement string is quoted, quote backslashes that quote
+	  `&' or `\' so strcreplace() preserves them
+	  Fixes most patsub_replacement compatibility issues with bash-4.2
+	  most recently raised by <a.elata@icloud.com>
+
+				   12/16
+				   -----
+lib/readline/bind.c
+	- show-mode-in-prompt: add V_SPECIAL flag so hack_special_boolean_var()
+	  gets called and _rl_reset_prompt will be called when it's changed
+	  Report and fix from Martin D Kealey <martin@kurahaupo.gen.nz>

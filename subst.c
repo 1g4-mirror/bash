@@ -353,6 +353,7 @@ static int shouldexp_replacement (const char *);
 static char *pos_params_pat_subst (char *, char *, char *, int);
 
 static char *expand_string_for_patsub (char *, int);
+static char *expand_string_for_patsub42 (char *, int);	/* BASH_COMPAT=42 version */
 static char *parameter_brace_patsub (char *, char *, array_eltstate_t *, char *, int, int, int);
 
 static char *pos_params_casemod (char *, char *, int, int);
@@ -3917,7 +3918,7 @@ expand_assignment_string_to_string (char *string, int quoted)
    or a backslash into a backslash. The output of this function must eventually
    be processed by strcreplace(). */
 static char *
-quote_string_for_repl (const char *string, int flags)
+quote_string_for_repl (const char *string, int quoted)
 {
   size_t slen;
   char *result, *t;
@@ -3951,12 +3952,24 @@ quote_string_for_repl (const char *string, int flags)
     {
       /* This function's result has to be processed by strcreplace() */
       if (*s == CTLESC && (s[1] == '&' || s[1] == '\\'))
-        {
-          *t++ = '\\';
-          s++;
-          *t++ = *s++;
-          continue;
-        }
+	{
+	  *t++ = '\\';
+	  s++;
+	  *t++ = *s++;
+	  continue;
+	}
+      /* Bash-4.2 and earlier don't perform quote removal on double-quoted
+	 pattern substitutions. */
+      if (shell_compatibility_level <= 42 &&
+	  (quoted & (Q_DOUBLE_QUOTES|Q_HERE_DOCUMENT)) &&
+	  *s == '\\' && (s[1] == '&' || s[1] == '\\'))
+	{
+	  *t++ = '\\'; *t++ = '\\';
+	  *t++ = '\\';
+	  s++;
+	  *t++ = *s++;
+	  continue;
+	}
       /* Dequote it */
       if (*s == CTLESC)
         {
@@ -4003,6 +4016,28 @@ expand_string_for_patsub (char *string, int quoted)
   else
     ret = (char *)NULL;
 
+  return (ret);
+}
+
+static char *
+expand_string_for_patsub42 (char *string, int quoted)
+{
+  char *ret, *t;
+
+  if (string == 0 || *string == '\0')
+    return (char *)NULL;
+
+  /* This is the bash-4.2 code from parameter_brace_patsub(). */
+  if (patsub_replacement == 0)
+    {
+      if ((quoted & (Q_HERE_DOCUMENT|Q_DOUBLE_QUOTES)) == 0)
+	ret = expand_string_if_necessary (string, quoted, expand_string_unsplit);
+      else
+	ret = expand_string_to_string_internal (string, quoted, expand_string_unsplit);
+    }
+  else
+    ret = expand_string_for_patsub (string, quoted);
+    
   return (ret);
 }
 
@@ -9501,11 +9536,8 @@ parameter_brace_patsub (char *varname, char *value, array_eltstate_t *estatep,
 	rep = expand_string_if_necessary (rep, quoted & ~(Q_DOUBLE_QUOTES|Q_HERE_DOCUMENT), expand_string_unsplit);
       else if (shell_compatibility_level > 42 && patsub_replacement)
 	rep = expand_string_for_patsub (rep, quoted & ~(Q_DOUBLE_QUOTES|Q_HERE_DOCUMENT));
-      /* This is the bash-4.2 code. */      
-      else if ((mflags & MATCH_QUOTED) == 0)
-	rep = expand_string_if_necessary (rep, quoted, expand_string_unsplit);
       else
-	rep = expand_string_to_string_internal (rep, quoted, expand_string_unsplit);
+	rep = expand_string_for_patsub42 (rep, quoted);
 
       /* Check whether or not to replace `&' in the replacement string after
 	 expanding it, since we want to treat backslashes quoting the `&'

@@ -823,4 +823,29 @@ two
 &two
 otwone
 &twone
+	new-exp17.sub
+unquoted word expansion with quoted pattern and replacement
+4.2: 4.2, a &lt; b
+5.3: 4.2, a &lt; b
+5.3: 5.2, a &lt; b
+double-quoted word expansion with quoted pattern and replacement
+4.2: 4.2, a '&lt;' b
+5.3: 4.2, a '&lt;' b
+5.3: 5.2, a &lt; b
+unquoted word expansion with unquoted pattern and replacement
+4.2: 4.2, a &lt; b
+5.3: 4.2, a <lt; b
+5.3: 5.2, a <lt; b
+double-quoted word expansion with unquoted pattern and replacement
+4.2: 4.2, a &lt; b
+5.3: 4.2, a &lt; b
+5.3: 5.2, a <lt; b
+unquoted word expansion with backslash-quoted &
+4.2: 4.2, a &lt; b
+5.3: 4.2, a &lt; b
+5.3: 5.2, a &lt; b
+double-quoted word expansion with backslash-quoted &
+4.2: 4.2, a \&lt; b
+5.3: 4.2, a \&lt; b
+5.3: 5.2, a &lt; b
 ./new-exp.tests: line 1: ABXD: parameter unset

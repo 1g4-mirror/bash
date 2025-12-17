@@ -668,6 +668,7 @@ test_runsub ./new-exp15.sub
 
 # pattern substitution with `&' (quoted and unquoted) in the replacement string
 test_runsub ./new-exp16.sub
+test_runsub ./new-exp17.sub	# test bash-4.2 compat
 
 expect $0: 'ABXD: parameter unset'
 ${THIS_SH} -c 'recho ${ABXD:?"parameter unset"}' $0

@@ -510,33 +510,53 @@ b_fill_buffer (BUFFERED_STREAM *bp)
   if (bp->b_flag & B_ERROR)	/* try making read errors `sticky' */
     return EOF;
 
-  /* In an environment where text and binary files are treated differently,
-     compensate for lseek() on text files returning an offset different from
-     the count of characters read() returns.  Text-mode streams have to be
-     treated as unbuffered. */
-  if ((bp->b_flag & (B_TEXT | B_UNBUFF)) == B_TEXT)
+  while (1)			/* loop to handle non-blocking fds */
     {
-      o = lseek (bp->b_fd, 0, SEEK_CUR);
-      nr = zread (bp->b_fd, bp->b_buffer, bp->b_size);
-      if (nr > 0 && nr < lseek (bp->b_fd, 0, SEEK_CUR) - o)
+      /* In an environment where text and binary files are treated differently,
+	 compensate for lseek() on text files returning an offset different from
+	 the count of characters read() returns.  Text-mode streams have to be
+	 treated as unbuffered. */
+      if ((bp->b_flag & (B_TEXT | B_UNBUFF)) == B_TEXT)
 	{
-	  lseek (bp->b_fd, o, SEEK_SET);
-	  bp->b_flag |= B_UNBUFF;
-	  bp->b_size = 1;
+	  o = lseek (bp->b_fd, 0, SEEK_CUR);
 	  nr = zread (bp->b_fd, bp->b_buffer, bp->b_size);
+	  if (nr > 0 && nr < lseek (bp->b_fd, 0, SEEK_CUR) - o)
+	    {
+	      lseek (bp->b_fd, o, SEEK_SET);
+	      bp->b_flag |= B_UNBUFF;
+	      bp->b_size = 1;
+	      nr = zread (bp->b_fd, bp->b_buffer, bp->b_size);
+	    }
 	}
-    }
-  else
-    nr = zread (bp->b_fd, bp->b_buffer, bp->b_size);
-  if (nr <= 0)
-    {
+      else
+	nr = zread (bp->b_fd, bp->b_buffer, bp->b_size);
+
+      if (nr > 0)
+ 	break;
+
       bp->b_used = bp->b_inputp = 0;
       bp->b_buffer[0] = 0;
+
       if (nr == 0)
-	bp->b_flag |= B_EOF;
+	{
+	  bp->b_flag |= B_EOF;
+	  return (EOF);
+	}
+      else if (errno == X_EAGAIN || errno == X_EWOULDBLOCK)
+	{
+	  if (sh_unset_nodelay_mode (bp->b_fd) < 0)
+	    {
+	      sys_error (_("cannot reset nodelay mode for fd %d"), bp->b_fd);
+	      bp->b_flag |= B_ERROR;
+	      return (EOF);
+	    }
+	  continue;
+	}
       else
-	bp->b_flag |= B_ERROR;
-      return (EOF);
+	{
+	  bp->b_flag |= B_ERROR;
+	  return (EOF);
+	}
     }
 
   bp->b_used = nr;
