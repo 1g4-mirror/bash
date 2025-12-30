@@ -421,6 +421,7 @@ parse_and_execute (char *string, const char *from_file, int flags)
 	      goto out;
 
 	    case DISCARD:
+	    case REINIT:
 	      if (command)
 		run_unwind_frame ("pe_dispose");
 	      last_result = last_command_exit_value = EXECUTION_FAILURE; /* XXX */
@@ -683,6 +684,7 @@ parse_string (char *string, const char *from_file, int flags, COMMAND **cmdp, ch
 	    case EXITPROG:
 	    case EXITBLTIN:
 	    case DISCARD:		/* XXX */
+	    case REINIT:
 	      if (command)
 		dispose_command (command);
 	      /* Remember to call longjmp (top_level) after the old
