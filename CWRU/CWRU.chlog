@@ -12447,3 +12447,38 @@ builtins/evalstring.c
 execute_cmd.c
 	- execute_command_internal: set currently_executing_command to NULL
 	  in places where we return from this function
+
+				   12/26
+				   -----
+builtins/history.def
+	- -H: new option, means to display history entries as they would be
+	  written to the history file, with timestamp information and without
+	  line numbers or `*'
+	- listing now takes a START-END range argument, so you can list a
+	  subset of the history list from START to END, with the format
+	  subject to the -H option. If START > END, list in reverse order.
+	  This moves history and fc functionality closer to convergence
+	- parse_range: new function, encapsulates parsing START-END history
+	  range specifiction; used by deletion and listing
+
+doc/bash.1,doc/bashref.texi
+	- history: update with a description of ranges, add description of -H;
+	  listing and deletion now reference range description
+
+				   12/30
+				   -----
+print_cmd.c
+	- print_case_clauses: reset was_heredoc to 0 after printing each case
+	  clause, since any here-document must have been associated with the
+	  command list following the pattern list and `)'
+	  Report from "Stan Marsh" <gazelle@xmission.com> back in May, 2025
+
+				   12/31
+				   -----
+doc/Makefile.in
+	- dvi: remove from default targets as per latest GNU coding standards
+
+redir.c
+	- stdin_redirection: now take the entire REDIRECT * as its argument,
+	  so we can do additional posix-mandated checking on redirections
+	  like 0<&0, to satisfy interp 1913

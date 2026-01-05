@@ -846,10 +846,12 @@ execute_command_internal (COMMAND *command, int asynchronous, int pipe_in, int p
     }
 #endif /* COMMAND_TIMING */
 
+  /* Is this a compound command with a redirection from stdin? POSIX interp
+     1913 makes it matter. */
   if (shell_control_structure (command->type) && command->redirects)
 {
     stdin_redirected = stdin_redirects (command->redirects);
-/*itrace("execute_command_internal: compound command with redirects: stdin_redirected = %d", stdin_redirected); */
+/*itrace("execute_command_internal: compound command with redirects: stdin_redirected = %d", stdin_redirected);*/
 }
 
 #if defined (PROCESS_SUBSTITUTION)

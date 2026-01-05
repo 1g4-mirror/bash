@@ -4,9 +4,9 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <!-- This text is a brief description of the features that are present in
-the Bash shell (version 5.3, 2 December 2025).
+the Bash shell (version 5.3, 26 December 2025).
 
-This is Edition 5.3, last updated 2 December 2025,
+This is Edition 5.3, last updated 26 December 2025,
 of The GNU Bash Reference Manual,
 for Bash, Version 5.3.
 
@@ -69,6 +69,7 @@ ul.toc-numbered-mark {list-style: none}
 
 
 
+
 <div class="top-level-extent" id="Top">
 <div class="nav-panel">
 <p>
@@ -77,10 +78,10 @@ Next: <a href="#Introduction" accesskey="n" rel="next">Introduction</a>, Previou
 <h1 class="top" id="Bash-Features-1"><span>Bash Features<a class="copiable-link" href="#Bash-Features-1"> &para;</a></span></h1>
 
 <p>This text is a brief description of the features that are present in
-the Bash shell (version 5.3, 2 December 2025).
+the Bash shell (version 5.3, 26 December 2025).
 The Bash home page is <a class="url" href="http://www.gnu.org/software/bash/">http://www.gnu.org/software/bash/</a>.
 </p>
-<p>This is Edition 5.3, last updated 2 December 2025,
+<p>This is Edition 5.3, last updated 26 December 2025,
 of <cite class="cite">The GNU Bash Reference Manual</cite>,
 for <code class="code">Bash</code>, Version 5.3.
 </p>
@@ -14437,7 +14438,7 @@ history list and history file.
 <dl class="table">
 <dt><a id="index-fc"></a><span><code class="code">fc</code><a class="copiable-link" href="#index-fc"> &para;</a></span></dt>
 <dd><div class="example">
-<pre class="example-preformatted"><code class="code">fc [-e <var class="var">ename</var>] [-lnr] [<var class="var">first</var>] [<var class="var">last</var>]</code>
+<pre class="example-preformatted"><code class="code">fc [-e <var class="var">ename</var>] [-D] [-lnr] [<var class="var">first</var>] [<var class="var">last</var>]</code>
 <code class="code">fc -s [<var class="var">pat</var>=<var class="var">rep</var>] [<var class="var">command</var>]</code>
 </pre></div>
 
@@ -14474,6 +14475,13 @@ value of the <code class="env">FCEDIT</code> variable if set, or the value of th
 <code class="env">EDITOR</code> variable if that is set, or <code class="code">vi</code> if neither is set.
 When editing is complete, <code class="code">fc</code> reads the file of edited commands
 and echoes and executes them.
+The <samp class="option">-D</samp> option, if supplied,
+causes <code class="code">fc</code> to remove the selected commands from the history
+list before executing the file of edited commands.
+<samp class="option">-D</samp> is only effective when <code class="code">fc</code> is invoked in this way.
+It could be used if you make a typo in a command and want to fix it using
+an editor while removing the erroneous command from the history to
+avoid clutter.
 </p>
 <p>In the second form, <code class="code">fc</code> re-executes <var class="var">command</var> after
 replacing each instance of <var class="var">pat</var> in the selected command with <var class="var">rep</var>.
@@ -14497,18 +14505,40 @@ is that of the re-executed command, unless
 </dd>
 <dt><a id="index-history"></a><span><code class="code">history</code><a class="copiable-link" href="#index-history"> &para;</a></span></dt>
 <dd><div class="example">
-<pre class="example-preformatted">history [<var class="var">n</var>]
+<pre class="example-preformatted">history [-H] [<var class="var">range</var>]
 history -c
-history -d <var class="var">offset</var>
-history -d <var class="var">start</var>-<var class="var">end</var>
+history -d <var class="var">range</var>
 history [-anrw] [<var class="var">filename</var>]
-history -ps <var class="var">arg</var>
+history -ps <var class="var">arg</var> [<var class="var">arg</var>...]
 </pre></div>
 
-<p>With no options, display the history list with numbers.
-Entries prefixed with a &lsquo;<samp class="samp">*</samp>&rsquo; have been modified.
-An argument of <var class="var">n</var> lists only the last <var class="var">n</var> entries.
-If the shell variable <code class="env">HISTTIMEFORMAT</code> is set and not null,
+<p>With no options,
+or with the <samp class="option">-H</samp> option,
+display the portion of the command history list
+specified by <var class="var">range</var>, as described below.
+If <var class="var">range</var> is not specified, display the entire history list.
+Without <samp class="option">-H</samp>, display the list with command numbers, prefixing
+entries that have been modified with a &lsquo;<samp class="samp">*</samp>&rsquo;.
+</p>
+<p>A
+<var class="var">range</var>
+argument is specified in the form of a number <var class="var">offset</var> or
+a range <var class="var">start</var>-<var class="var">end</var>.
+If <var class="var">offset</var> is supplied, it references the history entry at
+position <var class="var">offset</var> in the history list;
+when listing this displays the last <var class="var">offset</var> entries.
+A negative <var class="var">offset</var> counts back from the end of the history list,
+relative to one greater than the last history position.
+When listing, negative and positive <var class="var">offset</var>s have identical results.
+<var class="var">start</var> and <var class="var">end</var>, if supplied, reference the portion of
+the history list beginning at position <var class="var">start</var> through position
+<var class="var">end</var>.
+If <var class="var">start</var> or <var class="var">end</var> are negative, they count back from the
+end of the history list.
+When listing, if <var class="var">start</var> is greater than <var class="var">end</var>, the history
+entries are displayed in reverse order from <var class="var">end</var> to <var class="var">start</var>.
+</p>
+<p>If the shell variable <code class="env">HISTTIMEFORMAT</code> is set and not null,
 it is used as a format string for <code class="code">strftime</code>(3) to display
 the time stamp associated with each displayed history entry.
 If <code class="code">history</code> uses <code class="env">HISTTIMEFORMAT</code>, it does not print an
@@ -14522,21 +14552,17 @@ intervening space between the formatted time stamp and the history entry.
 This may be combined with the other options to replace the history list.
 </p>
 </dd>
-<dt><code class="code">-d <var class="var">offset</var></code></dt>
-<dd><p>Delete the history entry at position <var class="var">offset</var>.
-If <var class="var">offset</var> is positive, it should be specified as it appears when
-the history is displayed.
-If <var class="var">offset</var> is negative, it is interpreted as relative to one greater
-than the last history position, so negative indices count back from the
-end of the history, and an index of &lsquo;<samp class="samp">-1</samp>&rsquo; refers to the current
-<code class="code">history -d</code> command.
+<dt><code class="code">-d <var class="var">range</var></code></dt>
+<dd><p>Delete the history entries specified by <var class="var">range</var>, as described above.
+An offset of &lsquo;<samp class="samp">-1</samp>&rsquo; refers to the current <code class="code">history -d</code> command.
 </p>
 </dd>
-<dt><code class="code">-d <var class="var">start</var>-<var class="var">end</var></code></dt>
-<dd><p>Delete the range of history entries between positions <var class="var">start</var> and
-<var class="var">end</var>, inclusive.
-Positive and negative values for <var class="var">start</var> and <var class="var">end</var>
-are interpreted as described above.
+<dt><code class="code">-H</code></dt>
+<dd><p>Display the selected history entries in the format that would be written
+to the history file,
+including any time stamp information as described below,
+without prefixing the entry with any line number or
+&lsquo;<samp class="samp">*</samp>&rsquo;.
 </p>
 </dd>
 <dt><code class="code">-a</code></dt>

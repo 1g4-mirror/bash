@@ -5841,8 +5841,8 @@ SSHHEELLLL BBUUIILLTTIINN CCOOMMMMAANNDDSS
               ing  is  complete,  ffcc reads the file containing the edited com-
               mands and echoes and executes them.  The --DD option, if supplied,
               causes ffcc to remove the selected commands from the history  list
-              before executing the file of edited commands.  --DD is only active
-              when ffcc is invoked in this way.
+              before executing the file of edited commands.  --DD is only effec-
+              tive when ffcc is invoked in this way.
 
               In  the second form, ffcc re-executes _c_o_m_m_a_n_d after replacing each
               instance of _p_a_t with _r_e_p.  _C_o_m_m_a_n_d is interpreted  the  same  as
@@ -5973,21 +5973,36 @@ SSHHEELLLL BBUUIILLTTIINN CCOOMMMMAANNDDSS
 
               The return status is 0 unless no command matches _p_a_t_t_e_r_n.
 
-       hhiissttoorryy [[_n]]
+       hhiissttoorryy [[--HH]] [[_r_a_n_g_e]]
        hhiissttoorryy --cc
-       hhiissttoorryy --dd _o_f_f_s_e_t
-       hhiissttoorryy --dd _s_t_a_r_t-_e_n_d
+       hhiissttoorryy --dd _r_a_n_g_e
        hhiissttoorryy --aannrrww [_f_i_l_e_n_a_m_e]
        hhiissttoorryy --pp _a_r_g [_a_r_g ...]
        hhiissttoorryy --ss _a_r_g [_a_r_g ...]
-              With  no options, display the command history list with numbers.
-              Entries prefixed with a ** have been modified.  An argument of  _n
-              lists  only the last _n entries.  If the shell variable HHIISSTTTTIIMMEE--
-              FFOORRMMAATT is set and not null, it is used as a  format  string  for
-              _s_t_r_f_t_i_m_e(3)  to display the time stamp associated with each dis-
-              played history entry.  If hhiissttoorryy uses HHIISSTTTTIIMMEEFFOORRMMAATT,  it  does
-              not  print an intervening space between the formatted time stamp
-              and the history entry.
+              With  no  options, or with the --HH option, display the portion of
+              the command history list specified by _r_a_n_g_e, as described below.
+              If _r_a_n_g_e is not specified,  display  the  entire  history  list.
+              Without --HH, display the list with command numbers, prefixing en-
+              tries that have been modified with a "*".
+
+              A  _r_a_n_g_e argument is specified in the form of a number _o_f_f_s_e_t or
+              a range _s_t_a_r_t-_e_n_d.  If _o_f_f_s_e_t is  supplied,  it  references  the
+              history entry at position _o_f_f_s_e_t in the history list; when list-
+              ing  this  displays  the last _o_f_f_s_e_t entries.  A negative _o_f_f_s_e_t
+              counts back from the end of the history list,  relative  to  one
+              greater  than the last history position.  When listing, negative
+              and positive _o_f_f_s_e_t_s have identical results.  _s_t_a_r_t and _e_n_d,  if
+              supplied, reference the portion of the history list beginning at
+              position  _s_t_a_r_t through position _e_n_d.  If _s_t_a_r_t or _e_n_d are nega-
+              tive, they count back from the end of the  history  list.   When
+              listing,  if  _s_t_a_r_t is greater than _e_n_d, the history entries are
+              displayed in reverse order from _e_n_d to _s_t_a_r_t.
+
+              If the shell variable HHIISSTTTTIIMMEEFFOORRMMAATT is set and not null, it  is
+              used  as  a  format  string  for _s_t_r_f_t_i_m_e(3) to display the time
+              stamp associated with each displayed history entry.  If  hhiissttoorryy
+              uses  HHIISSTTTTIIMMEEFFOORRMMAATT, it does not print an intervening space be-
+              tween the formatted time stamp and the history entry.
 
               If _f_i_l_e_n_a_m_e is supplied, hhiissttoorryy uses it as the name of the his-
               tory file; if not, it uses the value of HHIISSTTFFIILLEE.   If  _f_i_l_e_n_a_m_e
@@ -5998,16 +6013,14 @@ SSHHEELLLL BBUUIILLTTIINN CCOOMMMMAANNDDSS
               --cc     Clear the history list by deleting all the entries.  This
                      can be used with the other options to replace the history
                      list.
-              --dd _o_f_f_s_e_t
-                     Delete the history entry at position _o_f_f_s_e_t.   If  _o_f_f_s_e_t
-                     is negative, it is interpreted as relative to one greater
-                     than the last history position, so negative indices count
-                     back  from  the  end  of  the history, and an index of -1
-                     refers to the current hhiissttoorryy --dd command.
-              --dd _s_t_a_r_t-_e_n_d
-                     Delete the range of  history  entries  between  positions
-                     _s_t_a_r_t  and  _e_n_d, inclusive.  Positive and negative values
-                     for _s_t_a_r_t and _e_n_d are interpreted as described above.
+              --dd _r_a_n_g_e
+                     Delete the history entries specified  by  _r_a_n_g_e,  as  de-
+                     scribed above.  An index of -1 refers to the current hhiiss--
+                     ttoorryy --dd command.
+              --HH     Display  the  selected history entries in the format that
+                     would be written to the history file, including any  time
+                     stamp  information  as described below, without prefixing
+                     the entry with any line number or "*".
               --aa     Append the "new"  history  lines  to  the  history  file.
                      These  are  history  lines entered since the beginning of
                      the current bbaasshh session, but not already appended to the
@@ -7577,4 +7590,4 @@ BBUUGGSS
 
        Array variables may not (yet) be exported.
 
-GNU Bash 5.3                   2025 December 18                        _B_A_S_H(1)
+GNU Bash 5.3                   2025 December 26                        _B_A_S_H(1)

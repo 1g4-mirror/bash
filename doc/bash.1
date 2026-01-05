@@ -5,7 +5,7 @@
 .\"	Case Western Reserve University
 .\"	chet.ramey@case.edu
 .\"
-.\"	Last Change: Thu Dec 18 17:18:21 EST 2025
+.\"	Last Change: Fri Dec 26 18:21:22 EST 2025
 .\"
 .\" For bash_builtins, strip all but "SHELL BUILTIN COMMANDS" section
 .\" For rbash, strip all but "RESTRICTED SHELL" section
@@ -22,7 +22,7 @@
 .ds zX \" empty
 .if \n(zZ=1 .ig zZ
 .if \n(zY=1 .ig zY
-.TH BASH 1 "2025 December 18" "GNU Bash 5.3"
+.TH BASH 1 "2025 December 26" "GNU Bash 5.3"
 .\"
 .ie \n(.g \{\
 .ds ' \(aq
@@ -10413,7 +10413,7 @@ option, if supplied,
 causes \fBfc\fP to remove the selected commands from the history
 list before executing the file of edited commands.
 .B \-D
-is only active when \fBfc\fP is invoked in this way.
+is only effective when \fBfc\fP is invoked in this way.
 .IP
 In the second form, \fBfc\fP re-executes \fIcommand\fP
 after replacing each instance of \fIpat\fP with \fIrep\fP.
@@ -10660,14 +10660,12 @@ prints the descriptions of all matching help topics.
 The return status is 0 unless no command matches
 .IR pattern .
 .TP
-\fBhistory [\fIn\fP]
+\fBhistory [\fB\-H\fP] [\fIrange\fP]
 .PD 0
 .TP
 \fBhistory\fP \fB\-c\fP
 .TP
-\fBhistory \-d\fP \fIoffset\fP
-.TP
-\fBhistory \-d\fP \fIstart\fP-\fIend\fP
+\fBhistory \-d\fP \fIrange\fP
 .TP
 \fBhistory\fP \fB\-anrw\fP [\fIfilename\fP]
 .TP
@@ -10675,15 +10673,33 @@ The return status is 0 unless no command matches
 .TP
 \fBhistory\fP \fB\-s\fP \fIarg\fP [\fIarg\fP .\|.\|.]
 .PD
-With no options, display the command history list with numbers.
-Entries prefixed with a
-.B *
-have been modified.
-An argument of
-.I n
-lists only the last
-.I n
-entries.
+With no options,
+or with the \fB\-H\fP option,
+display the portion of the command history list
+specified by \fIrange\fP, as described below.
+If \fIrange\fP is not specified, display the entire history list.
+Without \fB\-H\fP, display the list with command numbers, prefixing
+entries that have been modified with a
+.Q "*" .
+.IP
+A
+.I range
+argument is specified in the form of a number \fIoffset\fP or
+a range \fIstart\fP\-\fIend\fP.
+If \fIoffset\fP is supplied, it references the history entry at
+position \fIoffset\fP in the history list;
+when listing this displays the last \fIoffset\fP entries.
+A negative \fIoffset\fP counts back from the end of the history list,
+relative to one greater than the last history position.
+When listing, negative and positive \fIoffsets\fP have identical results.
+\fIstart\fP and \fIend\fP, if supplied, reference the portion of
+the history list beginning at position \fIstart\fP through position
+\fIend\fP.
+If \fIstart\fP or \fIend\fP are negative, they count back from the
+end of the history list.
+When listing, if \fIstart\fP is greater than \fIend\fP, the history
+entries are displayed in reverse order from \fIend\fP to \fIstart\fP.
+.IP
 If the shell variable
 .SM
 .B HISTTIMEFORMAT
@@ -10717,18 +10733,16 @@ Options, if supplied, have the following meanings:
 Clear the history list by deleting all the entries.
 This can be used with the other options to replace the history list.
 .TP
-\fB\-d\fP \fIoffset\fP
-Delete the history entry at position \fIoffset\fP.
-If \fIoffset\fP is negative, it is interpreted as relative to one greater
-than the last history position, so negative indices count back from the
-end of the history, and an index of \-1 refers to the current
-\fBhistory \-d\fP command.
+\fB\-d\fP \fIrange\fP
+Delete the history entries specified by \fIrange\fP, as described above.
+An index of \-1 refers to the current \fBhistory \-d\fP command.
 .TP
-\fB\-d\fP \fIstart\fP\-\fIend\fP
-Delete the range of history entries between positions \fIstart\fP and
-\fIend\fP, inclusive.
-Positive and negative values for \fIstart\fP and \fIend\fP
-are interpreted as described above.
+\fB\-H\fP
+Display the selected history entries in the format that would be written
+to the history file,
+including any time stamp information as described below,
+without prefixing the entry with any line number or
+.Q "*" .
 .TP
 .B \-a
 Append the

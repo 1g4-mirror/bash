@@ -2,9 +2,9 @@ This is bashref.info, produced by makeinfo version 7.2 from
 bashref.texi.
 
 This text is a brief description of the features that are present in the
-Bash shell (version 5.3, 18 December 2025).
+Bash shell (version 5.3, 26 December 2025).
 
-   This is Edition 5.3, last updated 18 December 2025, of ‘The GNU Bash
+   This is Edition 5.3, last updated 26 December 2025, of ‘The GNU Bash
 Reference Manual’, for ‘Bash’, Version 5.3.
 
    Copyright © 1988-2025 Free Software Foundation, Inc.
@@ -27,10 +27,10 @@ Bash Features
 *************
 
 This text is a brief description of the features that are present in the
-Bash shell (version 5.3, 18 December 2025).  The Bash home page is
+Bash shell (version 5.3, 26 December 2025).  The Bash home page is
 <http://www.gnu.org/software/bash/>.
 
-   This is Edition 5.3, last updated 18 December 2025, of ‘The GNU Bash
+   This is Edition 5.3, last updated 26 December 2025, of ‘The GNU Bash
 Reference Manual’, for ‘Bash’, Version 5.3.
 
    Bash contains features that appear in other popular shells, and some
@@ -10994,7 +10994,7 @@ history file.
      ‘fc’ reads the file of edited commands and echoes and executes
      them.  The ‘-D’ option, if supplied, causes ‘fc’ to remove the
      selected commands from the history list before executing the file
-     of edited commands.  ‘-D’ is only active when ‘fc’ is invoked in
+     of edited commands.  ‘-D’ is only effective when ‘fc’ is invoked in
      this way.  It could be used if you make a typo in a command and
      want to fix it using an editor while removing the erroneous command
      from the history to avoid clutter.
@@ -11017,21 +11017,36 @@ history file.
      history entry, in which case ‘fc’ returns a non-zero status.
 
 ‘history’
-          history [N]
+          history [-H] [RANGE]
           history -c
-          history -d OFFSET
-          history -d START-END
+          history -d RANGE
           history [-anrw] [FILENAME]
-          history -ps ARG
+          history -ps ARG [ARG...]
 
-     With no options, display the history list with numbers.  Entries
-     prefixed with a ‘*’ have been modified.  An argument of N lists
-     only the last N entries.  If the shell variable ‘HISTTIMEFORMAT’ is
-     set and not null, it is used as a format string for ‘strftime’(3)
-     to display the time stamp associated with each displayed history
-     entry.  If ‘history’ uses ‘HISTTIMEFORMAT’, it does not print an
-     intervening space between the formatted time stamp and the history
-     entry.
+     With no options, or with the ‘-H’ option, display the portion of
+     the command history list specified by RANGE, as described below.
+     If RANGE is not specified, display the entire history list.
+     Without ‘-H’, display the list with command numbers, prefixing
+     entries that have been modified with a ‘*’.
+
+     A RANGE argument is specified in the form of a number OFFSET or a
+     range START-END.  If OFFSET is supplied, it references the history
+     entry at position OFFSET in the history list; when listing this
+     displays the last OFFSET entries.  A negative OFFSET counts back
+     from the end of the history list, relative to one greater than the
+     last history position.  When listing, negative and positive OFFSETs
+     have identical results.  START and END, if supplied, reference the
+     portion of the history list beginning at position START through
+     position END.  If START or END are negative, they count back from
+     the end of the history list.  When listing, if START is greater
+     than END, the history entries are displayed in reverse order from
+     END to START.
+
+     If the shell variable ‘HISTTIMEFORMAT’ is set and not null, it is
+     used as a format string for ‘strftime’(3) to display the time stamp
+     associated with each displayed history entry.  If ‘history’ uses
+     ‘HISTTIMEFORMAT’, it does not print an intervening space between
+     the formatted time stamp and the history entry.
 
      Options, if supplied, have the following meanings:
 
@@ -11039,19 +11054,16 @@ history file.
           Clear the history list.  This may be combined with the other
           options to replace the history list.
 
-     ‘-d OFFSET’
-          Delete the history entry at position OFFSET.  If OFFSET is
-          positive, it should be specified as it appears when the
-          history is displayed.  If OFFSET is negative, it is
-          interpreted as relative to one greater than the last history
-          position, so negative indices count back from the end of the
-          history, and an index of ‘-1’ refers to the current ‘history
-          -d’ command.
+     ‘-d RANGE’
+          Delete the history entries specified by RANGE, as described
+          above.  An offset of ‘-1’ refers to the current ‘history -d’
+          command.
 
-     ‘-d START-END’
-          Delete the range of history entries between positions START
-          and END, inclusive.  Positive and negative values for START
-          and END are interpreted as described above.
+     ‘-H’
+          Display the selected history entries in the format that would
+          be written to the history file, including any time stamp
+          information as described below, without prefixing the entry
+          with any line number or ‘*’.
 
      ‘-a’
           Append the "new" history lines to the history file.  These are
@@ -13792,28 +13804,28 @@ Node: A Programmable Completion Example486053
 Node: Using History Interactively491401
 Node: Bash History Facilities492085
 Node: Bash History Builtins495823
-Node: History Interaction502698
-Node: Event Designators507651
-Node: Word Designators509232
-Node: Modifiers511627
-Node: Installing Bash513567
-Node: Basic Installation514686
-Node: Compilers and Options518565
-Node: Compiling For Multiple Architectures519318
-Node: Installation Names521074
-Node: Specifying the System Type523311
-Node: Sharing Defaults524060
-Node: Operation Controls524777
-Node: Optional Features525799
-Node: Reporting Bugs538525
-Node: Major Differences From The Bourne Shell539885
-Node: GNU Free Documentation License561315
-Node: Indexes586495
-Node: Builtin Index586949
-Node: Reserved Word Index594050
-Node: Variable Index596498
-Node: Function Index613914
-Node: Concept Index627912
+Node: History Interaction503421
+Node: Event Designators508374
+Node: Word Designators509955
+Node: Modifiers512350
+Node: Installing Bash514290
+Node: Basic Installation515409
+Node: Compilers and Options519288
+Node: Compiling For Multiple Architectures520041
+Node: Installation Names521797
+Node: Specifying the System Type524034
+Node: Sharing Defaults524783
+Node: Operation Controls525500
+Node: Optional Features526522
+Node: Reporting Bugs539248
+Node: Major Differences From The Bourne Shell540608
+Node: GNU Free Documentation License562038
+Node: Indexes587218
+Node: Builtin Index587672
+Node: Reserved Word Index594773
+Node: Variable Index597221
+Node: Function Index614637
+Node: Concept Index628635
 
 End Tag Table
 

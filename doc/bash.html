@@ -1,5 +1,5 @@
 <!-- Creator     : groff version 1.23.0 -->
-<!-- CreationDate: Tue Dec  2 16:55:58 2025 -->
+<!-- CreationDate: Wed Dec 31 13:23:39 2025 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -12232,8 +12232,8 @@ with a <i>name</i> that is not a function.</p>
 </table>
 
 <p style="margin-left:9%;"><b>fc</b> [<b>&minus;e</b>
-<i>ename</i>] [<b>&minus;lnr</b>] [<i>first</i>]
-[<i>last</i>] <b><br>
+<i>ename</i>] [<b>&minus;D</b>] [<b>&minus;lnr</b>]
+[<i>first</i>] [<i>last</i>] <b><br>
 fc &minus;s</b> [<i>pat</i>=<i>rep</i>] [<i>cmd</i>]</p>
 
 <p style="margin-left:18%;">The first form selects a range
@@ -12271,7 +12271,11 @@ variable, and the value of <b><small>EDITOR</small></b> if
 <b><small>FCEDIT</small></b> is not set. If neither variable
 is set, <b>fc</b> uses <i>vi.</i> When editing is complete,
 <b>fc</b> reads the file containing the edited commands and
-echoes and executes them.</p>
+echoes and executes them. The <b>&minus;D</b> option, if
+supplied, causes <b>fc</b> to remove the selected commands
+from the history list before executing the file of edited
+commands. <b>&minus;D</b> is only effective when <b>fc</b>
+is invoked in this way.</p>
 
 <p style="margin-left:18%; margin-top: 1em">In the second
 form, <b>fc</b> re-executes <i>command</i> after replacing
@@ -12486,23 +12490,44 @@ prints the descriptions of all matching help topics.</p>
 <p style="margin-left:18%; margin-top: 1em">The return
 status is 0 unless no command matches <i>pattern</i>.</p>
 
-<p style="margin-left:9%;"><b>history [</b><i>n</i><b>]
-<br>
+<p style="margin-left:9%;"><b>history [&minus;H]
+[</b><i>range</i><b>] <br>
 history &minus;c <br>
-history &minus;d</b> <i>offset</i> <b><br>
-history &minus;d</b> <i>start</i>-<i>end</i> <b><br>
+history &minus;d</b> <i>range</i> <b><br>
 history &minus;anrw</b> [<i>filename</i>] <b><br>
 history &minus;p</b> <i>arg</i> [<i>arg</i> ...] <b><br>
 history &minus;s</b> <i>arg</i> [<i>arg</i> ...]</p>
 
-<p style="margin-left:18%;">With no options, display the
-command history list with numbers. Entries prefixed with a
-<b>*</b> have been modified. An argument of <i>n</i> lists
-only the last <i>n</i> entries. If the shell variable
-<b><small>HISTTIMEFORMAT</small></b> is set and not null, it
-is used as a format string for <i>strftime</i>(3) to display
-the time stamp associated with each displayed history entry.
-If <b>history</b> uses
+<p style="margin-left:18%;">With no options, or with the
+<b>&minus;H</b> option, display the portion of the command
+history list specified by <i>range</i>, as described below.
+If <i>range</i> is not specified, display the entire history
+list. Without <b>&minus;H</b>, display the list with command
+numbers, prefixing entries that have been modified with a
+&ldquo;*&rdquo;.</p>
+
+<p style="margin-left:18%; margin-top: 1em">A <i>range</i>
+argument is specified in the form of a number <i>offset</i>
+or a range <i>start</i>&minus;<i>end</i>. If <i>offset</i>
+is supplied, it references the history entry at position
+<i>offset</i> in the history list; when listing this
+displays the last <i>offset</i> entries. A negative
+<i>offset</i> counts back from the end of the history list,
+relative to one greater than the last history position. When
+listing, negative and positive <i>offsets</i> have identical
+results. <i>start</i> and <i>end</i>, if supplied, reference
+the portion of the history list beginning at position
+<i>start</i> through position <i>end</i>. If <i>start</i> or
+<i>end</i> are negative, they count back from the end of the
+history list. When listing, if <i>start</i> is greater than
+<i>end</i>, the history entries are displayed in reverse
+order from <i>end</i> to <i>start</i>.</p>
+
+<p style="margin-left:18%; margin-top: 1em">If the shell
+variable <b><small>HISTTIMEFORMAT</small></b> is set and not
+null, it is used as a format string for <i>strftime</i>(3)
+to display the time stamp associated with each displayed
+history entry. If <b>history</b> uses
 <b><small>HISTTIMEFORMAT</small></b><small>,</small> it does
 not print an intervening space between the formatted time
 stamp and the history entry.</p>
@@ -12537,25 +12562,29 @@ list.</p> </td></tr>
 </table>
 
 <p style="margin-left:18%;"><b>&minus;d</b>
-<i>offset</i></p>
+<i>range</i></p>
 
-<p style="margin-left:27%;">Delete the history entry at
-position <i>offset</i>. If <i>offset</i> is negative, it is
-interpreted as relative to one greater than the last history
-position, so negative indices count back from the end of the
-history, and an index of &minus;1 refers to the current
-<b>history &minus;d</b> command.</p>
-
-<p style="margin-left:18%;"><b>&minus;d</b>
-<i>start</i>&minus;<i>end</i></p>
-
-<p style="margin-left:27%;">Delete the range of history
-entries between positions <i>start</i> and <i>end</i>,
-inclusive. Positive and negative values for <i>start</i> and
-<i>end</i> are interpreted as described above.</p>
+<p style="margin-left:27%;">Delete the history entries
+specified by <i>range</i>, as described above. An index of
+&minus;1 refers to the current <b>history &minus;d</b>
+command.</p>
 
 <table width="100%" border="0" rules="none" frame="void"
        cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="18%"></td>
+<td width="3%">
+
+
+<p><b>&minus;H</b></p></td>
+<td width="6%"></td>
+<td width="73%">
+
+
+<p>Display the selected history entries in the format that
+would be written to the history file, including any time
+stamp information as described below, without prefixing the
+entry with any line number or &ldquo;*&rdquo;.</p></td></tr>
 <tr valign="top" align="left">
 <td width="18%"></td>
 <td width="3%">
