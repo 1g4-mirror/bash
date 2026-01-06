@@ -369,7 +369,8 @@ void
 initialize_shell_variables (char **env, int privmode)
 {
   char *name, *string, *temp_string;
-  int c, char_index, string_index, string_length, ro;
+  int c, ro;
+  size_t char_index, string_index, string_length;
   SHELL_VAR *temp_var;
 
   create_variable_tables ();
@@ -454,7 +455,7 @@ initialize_shell_variables (char **env, int privmode)
 	  STREQN (BASHARRAY_SUFFIX, name + char_index - BASHARRAY_SUFFLEN, BASHARRAY_SUFFLEN) &&
 	  *string == '(' && string[1] == '[' && string[strlen (string) - 1] == ')')
 	{
-	  size_t namelen;
+	  size_t namelen, slen;
 	  char *tname;		/* desired imported array variable name */
 
 	  namelen = char_index - BASHARRAY_PREFLEN - BASHARRAY_SUFFLEN;

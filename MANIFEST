@@ -1492,6 +1492,7 @@ tests/redir10.sub	f
 tests/redir11.sub	f
 tests/redir12.sub	f
 tests/redir13.in	f
+tests/redir14.sub	f
 tests/rhs-exp.tests	f
 tests/rhs-exp.right	f
 tests/rhs-exp1.sub	f

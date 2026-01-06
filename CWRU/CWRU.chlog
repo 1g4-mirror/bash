@@ -12482,3 +12482,33 @@ redir.c
 	- stdin_redirection: now take the entire REDIRECT * as its argument,
 	  so we can do additional posix-mandated checking on redirections
 	  like 0<&0, to satisfy interp 1913
+	- stdin_redirection: if we are in posix mode, a redirection like
+	  0<&0 does not count as an explicit stdin redirection for the purpose
+	  of redirecting input from /dev/null, POSIX interp 1913
+
+doc/bash.1,doc/bashref.texi
+	- update the description of implicit redirection of stdin for async
+	  commands from /dev/null with the caveat that an explicit redirection
+	  of stdin overrides this
+	- update the posix mode section with info from interp 1913 about how
+	  <&0 doesn't count as an explicit redirection of stdin
+
+				 1/2/2026
+				 --------
+jobs.c
+	- notify_of_job_status: hold onto the job's exit status without printing
+	  a notification if the shell has started to run -c command and the
+	  job is in a () subshell or a compound command with pipe input;
+	  otherwise we get a spurious catch-all message
+
+				    1/5
+				    ---
+variables.c
+	- initialize_shell_variables: change string index and length variables
+	  to size_t
+	  Inspired by report from Marc Aurèle La France <tsi@tuyoix.net>
+
+jobs.c
+	- wait_for_background_pids: treat wait_for_single_pid returning > 256
+	  as an error, same as returning < 0, and check errno appropriately
+	  Report from Aleksey Covacevice <aleksey.covacevice@gmail.com>

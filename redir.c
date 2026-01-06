@@ -1400,8 +1400,15 @@ stdin_redirection (REDIRECT *rp)
     case r_reading_string:
       return (1);
     case r_duplicating_input:
-    case r_duplicating_input_word:
     case r_close_this:
+      return (rp->redirector.dest == 0
+#if 1 /*TAG: bash-5.4 POSIX interp 1913 */
+		&& (posixly_correct == 0 || rp->redirectee.dest != 0)
+#endif
+		);
+    case r_duplicating_input_word:
+      /* we defer evaluation of this until later, so just return based on the
+	 destination for now. */
       return (rp->redirector.dest == 0);
     case r_output_direction:
     case r_appending_to:

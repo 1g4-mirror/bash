@@ -5,7 +5,7 @@
 .\"	Case Western Reserve University
 .\"	chet.ramey@case.edu
 .\"
-.\"	Last Change: Fri Dec 26 18:21:22 EST 2025
+.\"	Last Change: Wed Dec 31 18:30:12 EST 2025
 .\"
 .\" For bash_builtins, strip all but "SHELL BUILTIN COMMANDS" section
 .\" For rbash, strip all but "RESTRICTED SHELL" section
@@ -22,7 +22,7 @@
 .ds zX \" empty
 .if \n(zZ=1 .ig zZ
 .if \n(zY=1 .ig zY
-.TH BASH 1 "2025 December 26" "GNU Bash 5.3"
+.TH BASH 1 "2025 December 31" "GNU Bash 5.3"
 .\"
 .ie \n(.g \{\
 .ds ' \(aq
@@ -774,11 +774,18 @@ of a semicolon to delimit commands.
 .PP
 If a command is terminated by the control operator
 .BR & ,
-the shell executes the command in the \fIbackground\fP
+the shell executes the command asynchronously
 in a subshell.
+This is known as executing a command in the \fIbackground\fP,
+and these are referred to as \fIasynchronous\fP commands.
 The shell does not wait for the command to
 finish, and the return status is 0.
-These are referred to as \fIasynchronous\fP commands.
+When job control is not active,
+the standard input for asynchronous commands,
+in the absence of any explicit redirections involving the standard input,
+is redirected from
+.FN /dev/null .
+.PP
 Commands separated or terminated by
 .B ;
 (or an equivalent
@@ -5920,7 +5927,8 @@ for how to control this behavior when not in posix mode.
 .PP
 If a command is followed by a \fB&\fP and job control is not active, the
 default standard input for the command is the empty file
-.FN /dev/null .
+.FN /dev/null ,
+unless the command has an explicit redirection involving the standard input.
 Otherwise, the invoked command inherits the file descriptors of the calling
 shell as modified by redirections.
 .SH ENVIRONMENT
