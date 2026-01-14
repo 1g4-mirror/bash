@@ -12512,3 +12512,32 @@ jobs.c
 	- wait_for_background_pids: treat wait_for_single_pid returning > 256
 	  as an error, same as returning < 0, and check errno appropriately
 	  Report from Aleksey Covacevice <aleksey.covacevice@gmail.com>
+
+sig.c
+	- termsig_handler: don't try to run the exit trap if we're supposed
+	  to be ignoring traps (until they're reset) in a subshell
+	  environment
+
+				    1/7
+				    ---
+execute_cmd.c
+	- execute_in_subshell: set SUBSHELL_IGNTRAP before checking for any
+	  fatal signal instead of calling clear_exit_trap(); this modifies
+	  the change from 12/1
+
+				    1/9
+				    ---
+bashline.c
+	- shell_expand_line_internal: rename shell_expand_line(), takes an
+	  additional argument saying whether or not to quote the individual
+	  words in the expanded line (which changes how the line is split
+	  initially, since shell-expand-line treats the line as a single
+	  potentially-quoted word)
+	- shell_expand_line: call shell_expand_line_internal
+	- shell-expand-and-requote-line: new bindable command, splits the
+	  line into individual words like with programmable completion,
+	  expands each one, including word splitting, then quotes the
+	  resultant words if necessary to prevent subsequent expansion
+	- shell_expand_and_requote_line: calls shell_expand_line_internal
+	  with a third argument of 1 to force quoting
+	  From a proposal by Koichi Murase <myoga.murase@gmail.com> in 2/2024

@@ -1,6 +1,6 @@
 /* execute_cmd.c -- Execute a COMMAND structure. */
 
-/* Copyright (C) 1987-2025 Free Software Foundation, Inc.
+/* Copyright (C) 1987-2026 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
@@ -1680,13 +1680,13 @@ execute_in_subshell (COMMAND *command, int asynchronous, int pipe_in, int pipe_o
 
   if (user_subshell)
     {
-      subshell_environment = SUBSHELL_PAREN;	/* XXX */
+      subshell_environment = SUBSHELL_PAREN|SUBSHELL_IGNTRAP;	/* XXX */
       if (asynchronous)
 	subshell_environment |= SUBSHELL_ASYNC;
     }
   else
     {
-      subshell_environment = 0;			/* XXX */
+      subshell_environment = SUBSHELL_IGNTRAP;			/* XXX */
       if (asynchronous)
 	subshell_environment |= SUBSHELL_ASYNC;
       if (pipe_in != NO_PIPE || pipe_out != NO_PIPE)
@@ -1694,10 +1694,6 @@ execute_in_subshell (COMMAND *command, int asynchronous, int pipe_in, int pipe_o
       if (user_coproc)
 	subshell_environment |= SUBSHELL_COPROC;
     }
-
-  /* clear the exit trap before checking for fatal signals, but don't free
-     the trap command (see below). */
-  clear_exit_trap (0);
 
   QUIT;
   CHECK_TERMSIG;

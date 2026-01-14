@@ -1,6 +1,6 @@
 /* variables.c -- Functions for hacking shell variables. */
 
-/* Copyright (C) 1987-2025 Free Software Foundation, Inc.
+/* Copyright (C) 1987-2026 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
@@ -455,7 +455,7 @@ initialize_shell_variables (char **env, int privmode)
 	  STREQN (BASHARRAY_SUFFIX, name + char_index - BASHARRAY_SUFFLEN, BASHARRAY_SUFFLEN) &&
 	  *string == '(' && string[1] == '[' && string[strlen (string) - 1] == ')')
 	{
-	  size_t namelen, slen;
+	  size_t namelen;
 	  char *tname;		/* desired imported array variable name */
 
 	  namelen = char_index - BASHARRAY_PREFLEN - BASHARRAY_SUFFLEN;

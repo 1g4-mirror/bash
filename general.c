@@ -1,6 +1,6 @@
 /* general.c -- Stuff that is used by all files. */
 
-/* Copyright (C) 1987-2025 Free Software Foundation, Inc.
+/* Copyright (C) 1987-2026 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
@@ -456,6 +456,24 @@ valid_function_word (WORD_DESC *word, int flags)
       err_invalidid (name);
       return (0);
     }
+
+#if 0	/*TAG: bash-5.4 kre@munnari.oz.au 6/11/2025 */
+  if (word->flags & W_QUOTED)
+    {
+      char *newname;
+
+      newname = string_quote_removal (name, 0);
+      if (newname == 0)
+	{
+	  err_invalidid (name);
+	  return (0);
+	}
+      free (word->word);
+      word->word = name = newname;
+      word->flags &= ~W_QUOTED;
+    }
+#endif
+  
   /* POSIX interpretation 383 -- this is an application requirement, but the
      shell should enforce it rather than allow a script to define a function
      that will never be called. */
