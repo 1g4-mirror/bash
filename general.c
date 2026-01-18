@@ -462,6 +462,8 @@ valid_function_word (WORD_DESC *word, int flags)
     {
       char *newname;
 
+      /* We perform quote removal on the function name identical to that
+         performed on a quoted delimiter in a here-document. */
       newname = string_quote_removal (name, 0);
       if (newname == 0)
 	{

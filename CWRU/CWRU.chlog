@@ -12541,3 +12541,42 @@ bashline.c
 	- shell_expand_and_requote_line: calls shell_expand_line_internal
 	  with a third argument of 1 to force quoting
 	  From a proposal by Koichi Murase <myoga.murase@gmail.com> in 2/2024
+
+				   1/13
+				   ----
+builtins/history.def
+	- history_error: new function, prints an error message for history
+	  file read or write errors for a few values of errno (EACCES,
+	  EIO, ENOENT, EISDIR)
+	- history_builtin: call history_error as appropriate
+	  From a suggestion by Dan Jacobson <jidanni@jidanni.org>
+
+				   1/14
+				   ----
+parser.h
+	- FUNSUB_CHAR: expand definition to include `;'
+
+parse.y
+	- parse_comsub,xparse_dolparen: make sure to include `;' as a valid
+	  character that introduces a potential funsub
+
+command.h
+	- PF_COMSUBNLS: new flags value for command substitution, means to
+	  not strip trailing newlines from command substitution output
+
+subst.c
+	- read_comsub: inhibit trailing newline removal if the PF_COMSUBNLS
+	  flag is set in the FLAGS parameter
+	- function_substitute: set PF_COMSUBNLS in the flags passed to
+	  read_comsub if the first character of the command string is `;'
+
+doc/bash.1,doc/bashref.texi
+	- document new form of nofork command substitution that preserves
+	  trailing newlines
+
+tests/comsub21.sub,tests/comsub23.sub,tests/comsub26.sub,tests/comsub27.sub
+	- added tests for ${; command; }
+
+tests/comsub28.sub
+	- new file, contains basic tests for ${; command; }
+	  From a contribution by Kevin Pulo <kevin.pulo@mongodb.com>

@@ -6858,37 +6858,41 @@ read_comsub (int fd, int quoted, int flags, int *rflag)
       return (char *)NULL;
     }
 
-  /* Strip trailing newlines from the output of the command. */
-  if (quoted & (Q_HERE_DOCUMENT|Q_DOUBLE_QUOTES))
+  /* Strip trailing newlines from the output of the command if 
+     FLAGS does not include PF_COMSUBNLS. */
+  if ((flags & PF_COMSUBNLS) == 0)
     {
-      while (istring_index > 0)
+      if (quoted & (Q_HERE_DOCUMENT|Q_DOUBLE_QUOTES))
 	{
-	  if (istring[istring_index - 1] == '\n')
+	  while (istring_index > 0)
 	    {
-	      --istring_index;
-
-	      /* If the newline was quoted, remove the quoting char. */
-	      if (istring[istring_index - 1] == CTLESC)
-		--istring_index;
-
-#ifdef __MSYS__
-	      if (istring_index > 0 && istring[istring_index - 1] == '\r')
+	      if (istring[istring_index - 1] == '\n')
 		{
 		  --istring_index;
 
-		  /* If the carriage return was quoted, remove the quoting char. */
-		  if (istring[istring_index - 1] == CTLESC)
+		  /* If the newline was quoted, remove the quoting char. */
+		  if (istring_index > 0 && istring[istring_index - 1] == CTLESC)
 		    --istring_index;
-		}
+
+#ifdef __MSYS__
+		  if (istring_index > 0 && istring[istring_index - 1] == '\r')
+		    {
+		      --istring_index;
+
+		      /* If the carriage return was quoted, remove the quoting char. */
+		      if (istring_index > 0 && istring[istring_index - 1] == CTLESC)
+			--istring_index;
+		    }
 #endif
+		}
+	      else
+		break;
 	    }
-	  else
-	    break;
+	  istring[istring_index] = '\0';
 	}
-      istring[istring_index] = '\0';
+      else
+	strip_trailing (istring, istring_index - 1, 1);
     }
-  else
-    strip_trailing (istring, istring_index - 1, 1);
 
   if (rflag)
     *rflag = tflag;
@@ -7012,7 +7016,7 @@ function_substitute (char *string, int quoted, int flags)
 {
   volatile int function_code;
   int valsub, stdout_valid, saveout, old_frozen;
-  int result, pflags, tflag, was_trap;
+  int result, pflags, tflag, xflags, was_trap;
   char *istring, *s;
   WORD_DESC *ret;
   SHELL_VAR *v;
@@ -7027,8 +7031,14 @@ function_substitute (char *string, int quoted, int flags)
   ARRAY *psa;
 #endif
 
+  xflags = flags;
   if (valsub = (string && *string == '|'))
     string++;
+  else if (string && *string == ';')
+    {
+      xflags |= PF_COMSUBNLS;
+      string++;
+    }
 
   /* In the case of no command to run, just return NULL. */
   for (s = string; s && *s && (shellblank (*s) || *s == '\n'); s++)
@@ -7192,7 +7202,7 @@ function_substitute (char *string, int quoted, int flags)
       /* We call anonclose as part of the outer nofork unwind-protects */
       BLOCK_SIGNAL (SIGINT, set, oset);
       lseek (afd, 0, SEEK_SET);
-      istring = read_comsub (afd, quoted, flags, &tflag);
+      istring = read_comsub (afd, quoted, xflags, &tflag);
       UNBLOCK_SIGNAL (oset);
     }
   else

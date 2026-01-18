@@ -14,7 +14,7 @@ This is Edition @value{EDITION}, last updated @value{UPDATED},
 of @cite{The GNU Bash Reference Manual},
 for @code{Bash}, Version @value{VERSION}.
 
-Copyright @copyright{} 1988--2025 Free Software Foundation, Inc.
+Copyright @copyright{} 1988--2026 Free Software Foundation, Inc.
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -2881,7 +2881,8 @@ which executes @var{command} in the current execution environment
 and captures its output, again with trailing newlines removed.
 
 The character @var{c} following the open brace must be a space, tab,
-newline, or @samp{|}, and the close brace must be in a position
+newline, @samp{|}, or @samp{;};
+and the close brace must be in a position
 where a reserved word may appear (i.e., preceded by a command terminator
 such as semicolon).
 Bash allows the close brace to be joined to the remaining characters in
@@ -2900,8 +2901,17 @@ function is executing, and the @code{return} builtin forces
 however, the rest of the execution environment,
 including the positional parameters, is shared with the caller.
 
-If the first character following the open brace
-is a @samp{|}, the construct expands to the
+If the first character following the open brace is a
+@samp{;},
+the construct behaves like the form above but
+preserves any trailing newlines in the output of @var{command}
+instead of removing them.
+This form is useful when the trailing newlines are significant
+and should not be stripped from the command's output.
+
+If the first character following the open brace is a
+@samp{|},
+the construct expands to the
 value of the @code{REPLY} shell variable after @var{command} executes,
 without removing any trailing newlines,
 and the standard output of @var{command} remains the same as in the

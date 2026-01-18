@@ -556,3 +556,10 @@ e
 
 ./history11.sub: line 71: history: 20: history position out of range
 ./history11.sub: line 72: history: -30: history position out of range
+	history12.sub
+./history12.sub: line 32: history: notthere: read error: No such file or directory
+./history12.sub: line 38: history: notthere: read error: Permission denied
+./history12.sub: line 40: history: .: read error: Is a directory
+./history12.sub: line 46: history: histdir: write error: Is a directory
+./history12.sub: line 47: history: histdir/notthere: write error: Permission denied
+./history12.sub: line 51: history: nodir/notthere: write error: No such file or directory

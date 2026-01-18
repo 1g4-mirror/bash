@@ -5,7 +5,7 @@
 .\"	Case Western Reserve University
 .\"	chet.ramey@case.edu
 .\"
-.\"	Last Change: Fri Jan  9 10:17:30 EST 2026
+.\"	Last Change: Wed Jan 14 15:46:08 EST 2026
 .\"
 .\" For bash_builtins, strip all but "SHELL BUILTIN COMMANDS" section
 .\" For rbash, strip all but "RESTRICTED SHELL" section
@@ -22,7 +22,7 @@
 .ds zX \" empty
 .if \n(zZ=1 .ig zZ
 .if \n(zY=1 .ig zY
-.TH BASH 1 "2026 January 9" "GNU Bash 5.3"
+.TH BASH 1 "2026 January 14" "GNU Bash 5.3"
 .\"
 .ie \n(.g \{\
 .ds ' \(aq
@@ -4221,7 +4221,11 @@ which executes \fIcommand\fP in the current execution environment
 and captures its output, again with trailing newlines removed.
 .PP
 The character \fIc\fP following the open brace must be a space, tab,
-newline, or \fB|\fP, and the close brace must be in a position
+newline,
+.Q | ,
+or
+.Q ; ;
+and the close brace must be in a position
 where a reserved word may appear (i.e., preceded by a command terminator
 such as semicolon).
 \fBBash\fP allows the close brace to be joined to the remaining characters in
@@ -4240,8 +4244,17 @@ function is executing, and the \fBreturn\fP builtin forces
 however, the rest of the execution environment,
 including the positional parameters, is shared with the caller.
 .PP
-If the first character following the open brace
-is a \fB|\fP, the construct expands to the
+If the first character following the open brace is a
+.Q ; ,
+the construct behaves like the form above but
+preserves any trailing newlines in the output of \fIcommand\fP
+instead of removing them.
+This form is useful when the trailing newlines are significant
+and should not be stripped from the command's output.
+.PP
+If the first character following the open brace is a
+.Q | ,
+the construct expands to the
 value of the \fBREPLY\fP shell variable after \fIcommand\fP executes,
 without removing any trailing newlines,
 and the standard output of \fIcommand\fP remains the same as in the
