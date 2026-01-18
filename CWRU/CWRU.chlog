@@ -12580,3 +12580,19 @@ tests/comsub21.sub,tests/comsub23.sub,tests/comsub26.sub,tests/comsub27.sub
 tests/comsub28.sub
 	- new file, contains basic tests for ${; command; }
 	  From a contribution by Kevin Pulo <kevin.pulo@mongodb.com>
+
+				   1/16
+				   ----
+lib/readline/complete.c
+	- _rl_internal_pager, get_y_or_n: readline's internal completions
+	  pager understands `f' as a synonym for ' ' and `d' to scroll by
+	  half the screen height, similar to `less'
+
+lib/readline/complete.c
+	- last_completion_nmatch: new variable, holds the number of matches
+	  returned by the last call to rl_complete, set to 0 or 1 as
+	  appropriate when we explicitly set last_completion_failed to 0 or 1
+	- rl_complete_internal: if the last completion attempt succeeded and
+	  returned multiple matches, but an immediate subsequent completion
+	  attempt returned a single match, insert the single match
+	  From a report by Adam Purkrt <adampurkrt78@gmail.com> in 5/2025
