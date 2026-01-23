@@ -85,6 +85,7 @@ extern int tt_setnoecho (TTYSTRUCT *);
 extern int tt_seteightbit (TTYSTRUCT *);
 extern int tt_setnocanon (TTYSTRUCT *);
 extern int tt_setcbreak (TTYSTRUCT *);
+extern int tt_seteol (TTYSTRUCT *, int);
 
 /* These functions are all generally mutually exclusive.  If you call
    more than one (bracketed with calls to ttsave and ttrestore, of
@@ -101,6 +102,8 @@ extern int ttfd_nocanon (int, TTYSTRUCT *);
 
 extern int ttfd_cbreak (int, TTYSTRUCT *);
 
+extern int ttfd_seteol (int, TTYSTRUCT *, int);
+
 /* These functions work with fd 0 and the TTYSTRUCT saved with ttsave () */
 extern int ttonechar (void);
 extern int ttnoecho (void);
@@ -108,5 +111,6 @@ extern int tteightbit (void);
 extern int ttnocanon (void);
 
 extern int ttcbreak (void);
+extern int ttseteol (int);
 
 #endif

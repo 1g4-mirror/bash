@@ -308,3 +308,32 @@ ttcbreak (void)
   tt = ttin;
   return (ttfd_cbreak (0, &tt));
 }
+
+int
+tt_seteol (TTYSTRUCT *ttp, int c)
+{
+#if defined (TERMIOS_TTY_DRIVER) || defined (TERMIO_TTY_DRIVER)
+  ttp->c_cc[VEOL] = c;
+#endif
+
+  return 0;
+}
+
+int
+ttfd_seteol (int fd, TTYSTRUCT *ttp, int c)
+{
+  if (tt_seteol (ttp, c) < 0)
+    return -1;
+  return (ttsetattr (fd, ttp));
+}
+
+int
+ttseteol (int c)
+{
+  TTYSTRUCT tt;
+
+  if (ttsaved == 0)
+    return -1;
+  tt = ttin;
+  return (ttfd_seteol (0, &tt, c));
+}

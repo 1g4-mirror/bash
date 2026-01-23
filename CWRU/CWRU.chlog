@@ -12596,3 +12596,26 @@ lib/readline/complete.c
 	  returned multiple matches, but an immediate subsequent completion
 	  attempt returned a single match, insert the single match
 	  From a report by Adam Purkrt <adampurkrt78@gmail.com> in 5/2025
+
+				   1/22
+				   ----
+examples/loadables/jobid.c
+	- jobid: new builtin, like the NetBSD sh builtin
+
+subst.c
+	- function_substitute: unwind-protect stdin_redirected, in case the
+	  nofork comsub causes it to be set (since it can run with pipe input
+	  and output).
+	  From a report by Hany Salem <hanysalemtx@gmail.com>
+
+				   1/23
+				   ----
+subst.c
+	- function_substitute: dup the file descriptor returned by anonopen
+	  using move_to_high_fd to get it out of the way of user-accessible
+	  fds.
+	  Report from Stephane Chazelas <stephane@chazelas.org>
+
+lib/sh/shtty.c,include/shtty.h
+	- ttseteol, ttfd_seteol, tt_seteol: new functions to set the tty's
+	  EOL character to something other than a newline

@@ -7060,6 +7060,7 @@ function_substitute (char *string, int quoted, int flags)
 	  sys_error ("%s", _("function_substitute: cannot open anonymous file for output"));
 	  exp_jump_to_top_level (DISCARD);		/* XXX */
 	}
+      afd = move_to_high_fd (afd, 1, -1);
     }
 
   gs = sh_getopt_save_istate ();
@@ -7082,6 +7083,7 @@ function_substitute (char *string, int quoted, int flags)
   unwind_protect_pointer (current_builtin);
   unwind_protect_pointer (currently_executing_command);
   unwind_protect_int (eof_encountered);
+  unwind_protect_int (stdin_redirected);
   add_unwind_protect (uw_pop_var_context, 0);
   add_unwind_protect (uw_maybe_restore_getopt_state, gs);
 
