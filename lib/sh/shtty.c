@@ -2,7 +2,7 @@
  * shtty.c -- abstract interface to the terminal, focusing on capabilities.
  */
 
-/* Copyright (C) 1999, 2022 Free Software Foundation, Inc.
+/* Copyright (C) 1999, 2022-2026 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 

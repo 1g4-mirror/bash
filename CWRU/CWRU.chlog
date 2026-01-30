@@ -12619,3 +12619,52 @@ subst.c
 lib/sh/shtty.c,include/shtty.h
 	- ttseteol, ttfd_seteol, tt_seteol: new functions to set the tty's
 	  EOL character to something other than a newline
+
+builtins/read.def
+	- read_builtin: if the `-d' option is supplied, neither `-n' nor `-N'
+	  is supplied, and the input is a tty, use tt_seteol to set the tty
+	  end-of-input-line delimiter to whatever the option argument is. This
+	  means we don't put the terminal into non-canonical mode and only
+	  issue one read(2) call. This also means that the normal canonical
+	  input processing (erase char, erase line, etc.) takes place. This
+	  will have to be revisited if the -d option is ever extended to
+	  multibyte characters. The behavior of a delimiter character that
+	  can appear as part of a multibyte character in some non-UTF-8
+	  locale needs to be tested as well.
+	- read_mbchar: handle unbuffered_read == 3 (read -d on a tty)
+	  From a suggestion by Robert Elz <kre@munnari.oz.au> back in 9/2025
+
+				   1/29
+				   ----
+general.c
+	- default_columns: use strtol and check the return values instead of
+	  using atoi on $COLUMNS
+
+variables.c
+	- sv_optind: use strtol and check the return values instead of using
+	  atoi on $OPTIND. This means that setting OPTIND to a non-numeric
+	  value is a no-op
+	- sv_opterr: use strtol and check the return values instead of using
+	  atoi on $OPTERR. This means that setting OPTERR to a non-numeric
+	  value sets sh_opterr to the default (1)
+	- sv_childmax: use strtol instead of atoi to convert $MAXCHILD. This
+	  means a conversion error is the same as 0
+
+eval.c
+	- read_command: use strtol and check the return values instead of using
+	  atoi on $TMOUT. This means that setting TMOUT to a non-numeric
+	  value is a no-op
+
+builtins/fc.def
+	- fc_gethnum: use strtol instead of using atoi on the numeric argument
+
+				   1/30
+				   ----
+array.c,array2.c
+	- array_subslice: return a string with the elements of an array between
+	  specified start and end indices, inclusive. A variant of
+	  array_subrange, but does not return a specified number of elements.
+	  Not used yet, but could be used for another array parameter
+	  expansion, like ksh93's array[s..e]
+
+

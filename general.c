@@ -1459,15 +1459,15 @@ conf_standard_path (void)
 int
 default_columns (void)
 {
-  char *v;
+  char *v, *e;
   int c;
 
   c = -1;
   v = get_string_value ("COLUMNS");
   if (v && *v)
     {
-      c = atoi (v);
-      if (c > 0)
+      c = (int)strtol (v, &e, 10);
+      if (e != v && *e == '\0' && c > 0)
 	return c;
     }
 

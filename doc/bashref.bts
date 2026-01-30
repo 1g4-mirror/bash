@@ -16,7 +16,7 @@
 \entry{\code {cd}}{53}
 \entry{\code {command}}{63}
 \entry{\code {compgen}}{161}
-\entry{\code {complete}}{161}
+\entry{\code {complete}}{162}
 \entry{\code {compopt}}{165}
 \entry{\code {continue}}{54}
 \initial {D}
