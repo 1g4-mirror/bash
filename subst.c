@@ -11605,7 +11605,11 @@ add_string:
 		goto add_character;
 	    }
 
+#if 0	/* TAG:bash-5.4 posix mode possibly */
+	  if (word->flags & (W_ASSIGNRHS|W_ASSIGNARG))
+#else
 	  if (word->flags & W_ASSIGNRHS)
+#endif
 	    tflag = 2;
 	  else if (word->flags & (W_ASSIGNMENT|W_TILDEEXP))
 	    tflag = 1;

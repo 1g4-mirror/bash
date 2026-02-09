@@ -12667,4 +12667,10 @@ array.c,array2.c
 	  Not used yet, but could be used for another array parameter
 	  expansion, like ksh93's array[s..e]
 
-
+				    2/5
+				    ---
+builtins/read.def
+	- read_builtin: if the delimiter happens to be _POSIX_VDISABLE, use
+	  the old character-at-a-time cbreak mode code path if we're reading
+	  from a tty
+	  Report from Martin D Kealey <martin@kurahaupo.gen.nz>
