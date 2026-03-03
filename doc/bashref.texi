@@ -9708,6 +9708,13 @@ There is ambiguity in @sc{posix} about this.
 @end ignore
 
 @item
+Bash does not perform redirections before expanding variable assignments
+preceding a simple command; it does not allow the redirections access to
+the results of the variable assignments, but any side effects of expanding
+the redirections take place first.
+If compiled in @i{strict posix} mode, Bash performs redirections first.
+
+@item
 As noted above, Bash requires the @code{xpg_echo} option to be enabled for
 the @code{echo} builtin to be fully conformant.
 

@@ -1052,7 +1052,7 @@ builtin_arrayref_flags (WORD_DESC *w, int baseflags)
 
 #  if 0
   /* This is a little sketchier but handles quoted arguments. */
-  if (array_expand_once && (t =  strchr (w->word, '[')) && t[strlen(t) - 1] == ']')
+  if (array_expand_once && (t = strchr (w->word, '[')) && t[strlen(t) - 1] == ']')
     vflags |= VA_ONEWORD|VA_NOEXPAND;
 #  endif
 

@@ -12722,10 +12722,12 @@ separate_out_assignments (WORD_LIST *tlist)
 #define WEXP_TILDEEXP	0x004
 #define WEXP_PARAMEXP	0x008
 #define WEXP_PATHEXP	0x010
+#define WEXP_DEFERVARS	0x020
 
 /* All of the expansions, including variable assignments at the start of
    the list. */
 #define WEXP_ALL	(WEXP_VARASSIGN|WEXP_BRACEEXP|WEXP_TILDEEXP|WEXP_PARAMEXP|WEXP_PATHEXP)
+#define WEXP_POSIX	(WEXP_ALL|WEXP_DEFERVARS)
 
 /* All of the expansions except variable assignments at the start of
    the list. */
@@ -12739,11 +12741,16 @@ separate_out_assignments (WORD_LIST *tlist)
 /* Take the list of words in LIST and do the various substitutions.  Return
    a new list of words which is the expanded list, and without things like
    variable assignments. */
-
+/* This is only called to expand the words of a simple command, so it can
+   pay attention to posix mode treatment of variable assignments. */
 WORD_LIST *
 expand_words (WORD_LIST *list)
 {
+#if defined (STRICT_POSIX)
+  return (expand_word_list_internal (list, posixly_correct ? WEXP_POSIX : WEXP_ALL));
+#else
   return (expand_word_list_internal (list, WEXP_ALL));
+#endif
 }
 
 /* Same as expand_words (), but doesn't hack variable or environment
@@ -13404,7 +13411,7 @@ expand_word_list_internal (WORD_LIST *list, int eflags)
       garglist = new_list = separate_out_assignments (new_list);
       if (new_list == 0)
 	{
-	  if (subst_assign_varlist)
+	  if (subst_assign_varlist && (eflags & WEXP_DEFERVARS) == 0)
 	    expand_assignment_statements ((char *)NULL, 1);
 
 	  return ((WORD_LIST *)NULL);
@@ -13438,7 +13445,7 @@ expand_word_list_internal (WORD_LIST *list, int eflags)
 	new_list = dequote_list (new_list);
     }
 
-  if ((eflags & WEXP_VARASSIGN) && subst_assign_varlist)
+  if (((eflags & (WEXP_VARASSIGN|WEXP_DEFERVARS)) == WEXP_VARASSIGN) && subst_assign_varlist)
     expand_assignment_statements ((new_list && new_list->word) ? new_list->word->word : (char *)NULL, new_list == 0);
 
   return (new_list);

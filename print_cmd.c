@@ -843,7 +843,7 @@ print_if_command (IF_COM *if_command)
   semicolon ();
   if (was_heredoc)
     {
-      indent (indentation_amount);
+      indent (indentation);
       cprintf ("then\n");
       was_heredoc = 0;
     }

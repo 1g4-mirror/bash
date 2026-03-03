@@ -12721,3 +12721,39 @@ subst.c,subst.h
 	- expand_words: call expand_assignment_statements instead of
 	  do_assignment_statements, remove some duplicate code
 
+				   2/25
+				   ----
+print_cmd.c
+	- print_if_command: if we have just printed the `action' command,
+	  and it ends with a here-document, fix indentation amount
+	  Report and fix from Weixie Cui <523516579@qq.com>
+
+				   2/27
+				   ----
+subst.c
+	- WEXP_DEFERVARS: new word expansion flag, means to defer assignment
+	  statements until after other word expansions and redirections
+	- WEXP_POSIX: new flag set for expand_word_list_internal, means to
+	  separate out the assignment statements but leave them in
+	  SUBST_ASSIGN_VARLIST
+	- if STRICT_POSIX is defined, expand_words calls expand_word_list_internal
+	  with WEXP_POSIX when in posix mode
+	- expand_word_list_internal: only call expand_assignment_statements if
+	  WEXP_DEFERVARS is not set in EFLAGS. It can only be set if the shell
+	  is compiled -DSTRICT_POSIX and in posix mode
+
+execute_cmd.c
+	- execute_null_command: if compiled -DSTRICT_POSIX and in posix mode,
+	  expand assignment statements after performing redirections and only
+	  if the redirections complete without errors
+	- execute_subshell_builtin_or_function,execute_builtin_or_function:
+	  if compiled -DSTRICT_POSIX and in posix mode, expand assignment
+	  statements after performing redirections and only if the
+	  redirections complete without errors
+	- execute_simple_command: if compiled -DSTRICT_POSIX and in posix mode,
+	  expand assignment statements after performing redirections and only
+	  if the redirections complete without errors, and defer environment
+	  creation until after calling expand_assignment_statements()
+
+
+

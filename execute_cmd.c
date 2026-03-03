@@ -106,6 +106,7 @@ extern int errno;
 #  include <mbstr.h>		/* mbschr */
 #endif
 
+extern WORD_LIST *subst_assign_varlist;
 extern int command_string_index;
 extern char *the_printed_command;
 extern time_t shell_start_time;
@@ -4272,10 +4273,15 @@ execute_null_command (REDIRECT *redirects, int pipe_in, int pipe_out, int async)
 	  if (code)
 	    exit (EXECUTION_FAILURE);
 
-	  if (do_redirections (redirects, RX_ACTIVE) == 0)
-	    exit (EXECUTION_SUCCESS);
-	  else
+	  if (do_redirections (redirects, RX_ACTIVE) != 0)
 	    exit (EXECUTION_FAILURE);
+
+#if defined (STRICT_POSIX)
+	  if (posixly_correct)
+	    exit (subst_assign_varlist ? expand_assignment_statements ((char *)NULL, 1) : EXECUTION_SUCCESS);
+	  else
+#endif
+	    exit (EXECUTION_SUCCESS);
 	}
       else
 	{
@@ -4299,6 +4305,11 @@ execute_null_command (REDIRECT *redirects, int pipe_in, int pipe_out, int async)
       r = do_redirections (redirects, RX_ACTIVE|RX_UNDOABLE);
       cleanup_redirects (redirection_undo_list);
       redirection_undo_list = (REDIRECT *)NULL;
+
+#if defined (STRICT_POSIX)
+      if (r == 0 && posixly_correct && subst_assign_varlist)
+	expand_assignment_statements ((char *)NULL, 1);
+#endif
 
       if (r != 0)
 	return (EXECUTION_FAILURE);
@@ -5608,6 +5619,11 @@ execute_subshell_builtin_or_function (WORD_LIST *words, REDIRECT *redirects,
       add_unwind_protect (uw_cleanup_redirects, (char *)saved_undo_list);
     }
 
+#if defined (STRICT_POSIX)
+  if (posixly_correct && subst_assign_varlist)
+    expand_assignment_statements (this_command_name, 0);
+#endif
+
   if (builtin)
     {
       int subshell_exit_value;
@@ -5742,6 +5758,11 @@ execute_builtin_or_function (WORD_LIST *words,
       begin_unwind_frame ("saved-redirects");
       add_unwind_protect (uw_cleanup_redirects, (char *)saved_undo_list);
     }
+
+#if defined (STRICT_POSIX)
+  if (posixly_correct && subst_assign_varlist)
+    expand_assignment_statements (this_command_name, 0);
+#endif
 
   if (builtin)
     result = execute_builtin (builtin, words, flags, 0);
@@ -5920,8 +5941,13 @@ execute_disk_command (WORD_LIST *words, REDIRECT *redirects, char *command_line,
       if (nofork && pipe_in == NO_PIPE && pipe_out == NO_PIPE && (subshell_environment & SUBSHELL_PIPE) == 0)
 	adjust_shell_level (-1);
 
-      maybe_make_export_env ();
-      put_command_name_into_env (command);
+#if defined (STRICT_POSIX)
+      if (posixly_correct == 0 || subst_assign_varlist == 0) /* Done below. */
+#endif
+	{
+	  maybe_make_export_env ();
+	  put_command_name_into_env (command);
+	}
     }
   else if (command == 0 && notfound_str == 0)	/* make sure */
     init_notfound_str ();
@@ -6001,9 +6027,20 @@ execute_disk_command (WORD_LIST *words, REDIRECT *redirects, char *command_line,
 	  exit (EXECUTION_FAILURE);
 	}
 
+#if defined (STRICT_POSIX)
+      if (posixly_correct && subst_assign_varlist)
+	{
+	  expand_assignment_statements (command, 0);
+
+	  maybe_make_export_env ();
+	  put_command_name_into_env (command);
+	}
+#endif
+
 #if defined (PROCESS_SUBSTITUTION) && !defined (HAVE_DEV_FD)
       /* This should only contain FIFOs created as part of redirection
-	 expansion. */
+	 expansion and expanding the rhs of assignment statements in
+	 posix mode. */
       unlink_all_fifos ();
 #endif
 
