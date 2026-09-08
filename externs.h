@@ -102,6 +102,7 @@ extern int reader_loop (void);
 extern int pretty_print_loop (void);
 extern int parse_command (void);
 extern int read_command (void);
+extern int input_timeout_hook (void);
 
 /* Functions from braces.c. */
 #if defined (BRACE_EXPANSION)

@@ -88,4 +88,10 @@ do { \
     if (interrupt_state) zreset (); \
   } while (0)
 
+#define CHECK_INPUT_TIMEOUT \
+do { \
+  if (input_timeout_seen) \
+    input_timeout_hook (); \
+} while (0)
+
 #endif /* _QUIT_H_ */

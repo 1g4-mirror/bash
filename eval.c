@@ -32,6 +32,10 @@
 
 #include <signal.h>
 
+#if defined (HAVE_TERMIOS_H)
+#  include <termios.h>
+#endif
+
 #include "bashintl.h"
 
 #include "shell.h"
@@ -44,6 +48,12 @@
 #include "input.h"
 #include "execute_cmd.h"
 
+/* If we are using readline timeouts and timeout hooks */
+#if defined (READLINE)
+#  include "bashline.h"
+#  include <readline/readline.h>
+#endif /* READLINE */
+
 #if defined (HISTORY)
 #  include "bashhist.h"
 #endif
@@ -53,7 +63,11 @@
 #endif
 
 static void send_pwd_to_eterm (void);
+static void alrm_handler (int);
 static sighandler alrm_catcher (int);
+
+int input_timeout_set = 0;
+volatile sig_atomic_t input_timeout_seen = 0;
 
 /* Read and execute commands until EOF is reached.  This assumes that
    the input source has already been initialized. */
@@ -254,16 +268,29 @@ pretty_print_loop (void)
 }
 
 static sighandler
-alrm_catcher(int i)
+alrm_catcher (int i)
 {
-  char *msg;
+  input_timeout_seen = 1;
+  SIGRETURN (0);
+}
 
-  msg = _("\007timed out waiting for input: auto-logout\n");
-  write (1, msg, strlen (msg));
+static void
+alrm_handler(int i)
+{
+  printf ("\007%s\n", _("timed out waiting for input: auto-logout"));
+  fflush (stdout);
 
+  tcflush (fileno (stdin), TCIFLUSH);
   bash_logout ();	/* run ~/.bash_logout if this is a login shell */
   jump_to_top_level (EXITPROG);
-  SIGRETURN (0);
+}
+
+/* We can use this for both readline and non-readline cases */
+int
+input_timeout_hook (void)
+{
+  alrm_handler (SIGALRM);
+  return 0;
 }
 
 /* Send an escape sequence to emacs term mode to tell it the
@@ -405,8 +432,19 @@ read_command (void)
 	  tmout_len = (int)strtol (t, &e, 10);
 	  if (e != t && *e == '\0' && tmout_len > 0)
 	    {
-	      old_alrm = set_signal_handler (SIGALRM, alrm_catcher);
-	      alarm (tmout_len);
+	      input_timeout_set = 1;
+	      if (no_line_editing)
+		{
+		  old_alrm = set_signal_handler (SIGALRM, alrm_catcher);
+		  alarm (tmout_len);
+		}
+#if defined (READLINE)
+	      else
+		{
+		  rl_timeout_event_hook = input_timeout_hook;
+		  rl_set_timeout (tmout_len, 0);
+		}
+#endif
 	    }
 	}
     }
@@ -416,10 +454,21 @@ read_command (void)
   current_command_line_count = 0;
   result = parse_command ();
 
-  if (interactive && tmout_var && (tmout_len > 0))
+  if (interactive && input_timeout_set)
     {
-      alarm(0);
-      set_signal_handler (SIGALRM, old_alrm);
+      if (no_line_editing)
+	{
+	  alarm(0);
+	  set_signal_handler (SIGALRM, old_alrm);
+	}
+#if defined (READLINE)
+      else
+	{
+	  rl_clear_timeout ();
+	  rl_timeout_event_hook = NULL;
+	}
+#endif
+      input_timeout_set = 0;
     }
 
   return (result);

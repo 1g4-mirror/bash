@@ -1844,12 +1844,14 @@ yy_stream_get (void)
   int result;
 
   result = EOF;
+  CHECK_INPUT_TIMEOUT;
   if (bash_input.location.file)
     {
       /* XXX - don't need terminate_immediately; stream_getc checks
 	 for terminating signals itself if read returns < 0 */
       result = stream_getc (bash_input.location.file);
     }
+  CHECK_INPUT_TIMEOUT;
   return (result);
 }
 
@@ -6024,7 +6026,7 @@ reset_readline_prompt (void)
    semi-colons.  When concatenating multiple lines of history, the
    newline separator for such tokens is replaced with a space. */
 static const int no_semi_successors[] = {
-  '\n', '{', '(', ')', ';', '&', '|',
+  '\n', '{', '(', ')', ';', '&', '|', BAR_AND,
   CASE, DO, ELSE, IF, SEMI_SEMI, SEMI_AND, SEMI_SEMI_AND, THEN, UNTIL,
   WHILE, AND_AND, OR_OR, IN, DOLPAREN, DOLBRACE,
   0

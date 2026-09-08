@@ -293,7 +293,7 @@ history_builtin (WORD_LIST *list)
   if (flags & AFLAG)		/* Append session's history to file. */
     {
       result = maybe_append_history (filename, using_histfile);
-      if (using_histfile)
+      if (result == 0 && using_histfile)
 	history_lines_this_session = 0;
     }
   else if (flags & WFLAG)	/* Write entire history. */
@@ -317,7 +317,9 @@ history_builtin (WORD_LIST *list)
 	 I/O and permission errors. */
       if (result > 0)
 	history_error (filename, result, 1);
-      if (result == 0)
+      /* Only act like these are new history entries if we are not reading
+	 from $HISTFILE */
+      if (result == 0 && using_histfile == 0)
         history_lines_this_session += history_lines_read_from_file;
     }
   else if (flags & NFLAG)	/* Read `new' history from file. */

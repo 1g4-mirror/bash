@@ -1,0 +1,129 @@
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#   Originally by Zachary Santer <zsanter@gmail.com>
+#   Modified by Chet Ramey <chet.ramey@case.edu> for the Bash test suite
+#
+
+: ${THIS_SH:=./bash}
+
+set -o nounset -o noglob +o braceexpand
+shopt -s lastpipe
+unset CDPATH TMOUT
+declare -r -x LC_ALL='C'
+
+main () {
+
+  local declaration
+  if (( ${#} == 0 )) then
+    declaration='declare -A assoc
+  '
+  else
+    declaration="${1} -A "
+  fi
+
+  while (( test_count < 512 )); do
+    (( ++test_count ))
+
+    # Create an associative array compound assignment containing random-length
+    # quoted arrays, unquoted scalars, and literals
+
+    local -i array_count=0
+    local -i scalar_count=0
+
+    local script="\
+set -o nounset -o noglob +o braceexpand
+shopt -s lastpipe
+unset CDPATH TMOUT
+declare -r -x LC_ALL='C'
+
+main () {
+
+"
+
+    local test_case=''
+
+    local assignment_contents=''
+
+    while (( ( SRANDOM & 7 ) > 0 )) do
+
+      local -i type_selector="$(( SRANDOM & 32767 ))"
+      if (( type_selector < 10923 )) then
+        assignment_contents+=" '${SRANDOM//[01]/& }'"
+      else
+        local -a list=()
+        local -i element_count
+        for (( element_count = SRANDOM & 7; element_count > 0; --element_count )) do
+          list+=( "${SRANDOM}" )
+        done
+        if (( type_selector < 21845 )) then
+          local array_name="array_$(( array_count++ ))"
+	  list=( "${list[@]//[01]/& }" )
+          test_case+="  local -a ${array_name}=( ${list[*]@Q} )"$'\n'
+          assignment_contents+=" \"\${${array_name}[@]}\""
+        else
+          local scalar_name="scalar_$(( scalar_count++ ))"
+          test_case+="  local ${scalar_name}='${list[*]}'"$'\n'
+          assignment_contents+=" \${${scalar_name}}"
+        fi
+      fi
+
+    done
+
+    test_case+="\
+
+  ${declaration}assoc=(${assignment_contents} )
+  set --${assignment_contents}"
+
+    script+="${test_case}"'
+
+  breakage="false"
+  if (( ( ( ${#} + 1 ) / 2 ) != ${#assoc[@]} )) then
+    breakage="true"
+  fi
+  while [[ ${breakage} == "false" && ${#} -gt 1 ]] do
+    if [[ ${assoc[${1}]} != "${2}" ]] then
+      breakage="true"
+    fi
+    shift 2
+  done
+  if [[ ${breakage} == "false" && ${#} -eq 1 && -n ${assoc[${1}]} ]] then
+    breakage="true"
+  fi
+  [[ ${breakage} == "false" ]]
+  exit
+
+}
+
+main
+'
+
+    if ! ${THIS_SH} -c "${script}"; then
+      (( ++error_count ))
+      printf '========\n'
+      printf '%s\n' "${test_case}"
+      printf '========\n'
+    fi
+
+  done
+
+}
+
+declare -i test_count=0
+declare -i error_count=0
+
+
+main # local
+main export
+
+exit ${error_count}

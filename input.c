@@ -1,6 +1,6 @@
 /* input.c -- functions to perform buffered input with synchronization. */
 
-/* Copyright (C) 1992-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1992-2026 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
@@ -114,6 +114,11 @@ stream_getc (FILE *stream)
 	    }
 	  else if (interrupt_state || terminating_signal)	/* QUIT; */
 	    local_index = local_bufused = 0;
+	  else if (input_timeout_seen)				/* CHECK_INPUT_TIMEOUT; */
+	    {
+	      local_index = local_bufused = 0;
+	      return EOF;
+	    }
 	}
       local_index = 0;
     }

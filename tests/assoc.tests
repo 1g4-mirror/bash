@@ -275,3 +275,6 @@ test_runsub ./assoc18.sub
 
 # tests with tilde expansion in keys and values post-bash-5.2
 test_runsub ./assoc19.sub
+
+# new bash-5.4 kv-pair compound assignment word splitting behavior
+test_runsub ./assoc20.sub

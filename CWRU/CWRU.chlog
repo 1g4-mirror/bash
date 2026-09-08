@@ -13316,3 +13316,47 @@ doc/bash.1,doc/bashref.texi,lib/readline/doc/hsuser.texi
 	  maximum in the file to avoid partial history entries or history
 	  entries without a timestamp (if the file has them)
 	  From https://savannah.gnu.org/bugs/?68650
+
+				   8/28
+				   ----
+
+eval.c
+	- alrm_catcher: change to only be active if readline isn't being used;
+	  all it does now is set a flag (input_timeout_seen)
+	- read_command: use rl_set_timeout and rl_timeout_event_hook to
+	  implement the timeout specified by $TMOUT if readline is being used;
+	  use SIGALRM only if readline is not being used (--nolineediting)
+	- alrm_handler: renamed alrm_catcher to this; add call to tcflush to
+	  make sure tty input buffer is empty if we time out reading input
+	- input_timeout_hook: new function, used by both readline and non-
+	  readline paths, just calls alrm_handler
+
+shell.h
+	- extern declaration for input_timeout_seen
+
+externs.h
+	- extern declaration for input_timeout_hook()
+
+quit.h
+	- CHECK_INPUT_TIMEOUT: new signal macro, calls input_timeout_hook
+	  if we have caught SIGALRM and set input_timeout_seen
+
+parse.y
+	- yy_stream_get: add calls to CHECK_INPUT_TIMEOUT around call to
+	  stream_getc
+
+input.c
+	- stream_getc: if we get SIGALRM and set input_timeout_seen, reset
+	  the local buffer variables and return EOF. Caller will handle
+	  checking for input_timeout_seen and calling input_timeout_hook()
+
+parse.y
+	- no_semi_successors: add BAR_AND to list of tokens that should not
+	  be converted from newline to semicolon
+	  Report from Alberto Millán <hambled@gmail.com>
+
+				   8/31
+				   ----
+builtins/history.def
+	- history_builtin: history -r should increase history_lines_this_session
+	  only if *not* reading from $HISTFILE

@@ -1,6 +1,6 @@
 /* shell.h -- The data structures used by the shell */
 
-/* Copyright (C) 1993-2024 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2026 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
@@ -114,6 +114,8 @@ extern int indirection_level;
 extern int shell_compatibility_level;
 extern const int default_compatibility_level;
 extern int running_under_emacs;
+extern int input_timeout_set;
+extern volatile sig_atomic_t input_timeout_seen;
 
 extern int pretty_print_mode;
 
